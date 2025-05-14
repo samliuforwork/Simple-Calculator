@@ -56,11 +56,11 @@ function render(innerCount, spacing) {
   const L = adjTotal(), W = adjWidth();
   resultsEl.innerHTML = `
     <h2>結果</h2>
-    <p>中間根數 <b>${innerCount}</b> → 間距 <b>${spacing.toFixed(2)}</b> cm</p>
+    <p>中間根數 <b>${innerCount}</b> → 間距 <b>${spacing.toFixed(2)}</b> mm</p>
     <h3>所有可行方案（柱數 → 間距）</h3>
     <ul>
       ${genAllSchemes(L, W).map(o =>
-        `<li>${o.count} 根 → 間距 ${o.spacing.toFixed(2)} cm</li>`
+        `<li>${o.count} 根 → 間距 ${o.spacing.toFixed(2)} mm</li>`
       ).join('')}
     </ul>
   `;
@@ -141,7 +141,7 @@ function drawPreview(totalOuter, barW, innerCount, spacing) {
   ctx.stroke();
   // 文字
   ctx.font = '16px sans-serif';
-  ctx.fillText(`${rawTotal.toFixed(2)} cm`, w / 2, dimY - 10);
+  ctx.fillText(`${rawTotal.toFixed(2)} mm`, w / 2, dimY - 10);
 
   // 4) 每段間距尺寸（共 innerCount+1 段）
   ctx.lineWidth = 1;
