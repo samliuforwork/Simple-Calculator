@@ -1,5 +1,17 @@
-* { box-sizing: border-box; }
-body { margin: 0; font-family: sans-serif; }
+
+:root {
+  font-size: 18px;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 1rem;
+}
+
 .container {
   max-width: 600px;
   margin: auto;
@@ -9,43 +21,100 @@ body { margin: 0; font-family: sans-serif; }
   gap: 1rem;
 }
 
+h1, h2, h3,
+label, button, #results {
+  font-size: 1.25rem;
+}
+
 form {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
 }
 
 label {
-  flex: 1 1 45%;
+  flex: 1 1 100%;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-}
-
-.toggle-group label {
-  flex: 1 1 auto;
+  font-size: 1.125rem;
 }
 
 input[type="number"] {
-  width: 100px;
+  width: 100%;
+  max-width: 240px;
+  padding: 0.75rem;
+  font-size: 1.125rem;
+  height: 2.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+}
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+}
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px; bottom: 3px;
+  background-color: white;
+  transition: .4s;
+}
+input:checked + .slider {
+  background-color: #4caf50;
+}
+input:checked + .slider:before {
+  transform: translateX(16px);
+}
+.slider.round {
+  width: 50px;
+  border-radius: 24px;
+}
+.slider.round:before {
+  border-radius: 50%;
 }
 
 button {
-  padding: 0.5rem;
-  font-size: 1rem;
+  padding: 0.75rem;
+  font-size: 1.125rem;
   width: 100%;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
 }
 
 #results {
   margin-top: 1rem;
+  font-size: 1.125rem;
 }
 
 @media (max-width: 480px) {
-  label { flex: 1 1 100%; }
+  label {
+    flex: 1 1 100%;
+  }
 }
