@@ -101,73 +101,91 @@ function adjWidth() {
 
 // 繪製示意圖，左右端為灰色，中間為橘色
 function drawPreview(total, barW, innerCount, spacing) {
-  const totalBars = innerCount + 2;
-  const padding   = 40;
-  const w         = canvas.width;
-  const h         = canvas.height;
-  const baselineY = h - 40;
-  const titleY    = 30;
-  const scale     = (w - padding * 2) / total;
+  const totalBars    = innerCount + 2;
+  const padding      = 40;
+  const w            = canvas.width;
+  const h            = canvas.height;
+  const railTopY     = 60;
+  const railBottomY  = h - 60;
+  const railGap      = 6;    // 雙線橫樑間距
+  const scale        = (w - padding * 2) / total;
+  const barWpx       = barW * scale;
+  const spPx         = spacing * scale;
 
   // 清空
   ctx.clearRect(0, 0, w, h);
-  // 標題
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#000';
-  ctx.font = '16px sans-serif';
-  ctx.fillText(
-    `${innerCount} 根（不含端柱）等距排布 (間距 ${spacing.toFixed(2)} cm)`,
-    w / 2,
-    titleY
-  );
-  // 基準線
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.moveTo(padding, baselineY);
-  ctx.lineTo(w - padding, baselineY);
-  ctx.stroke();
 
-  const barWpx = barW * scale;
-  const spPx   = spacing * scale;
-  const barH   = 60;
-  let x = padding;
-
-  // 柱子：首尾灰色，中間橘色
-  for (let i = 0; i < totalBars; i++) {
-    ctx.fillStyle = (i === 0 || i === totalBars - 1) ? '#CCC' : '#FFA500';
-    ctx.fillRect(x, baselineY - barH, barWpx, barH);
-    x += barWpx + spPx;
-  }
-
-  // 標示間距箭頭
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth   = 1;
+  // 基本設定：深藍色、線寬 2px
+  ctx.strokeStyle = '#003366';
+  ctx.fillStyle   = '#003366';
+  ctx.lineWidth   = 2;
   ctx.textAlign   = 'center';
   ctx.font        = '14px sans-serif';
-  const arrowY = titleY + 40;
-  x = padding;
-  for (let i = 0; i < totalBars - 1; i++) {
-    const startX = x + barWpx;
-    const endX   = startX + spPx;
-    // 箭頭線
+
+  // 1. 畫雙線上、下橫樑
+  ctx.beginPath();
+  // 上橫樑
+  ctx.moveTo(padding,         railTopY);
+  ctx.lineTo(w - padding,     railTopY);
+  ctx.moveTo(padding,         railTopY + railGap);
+  ctx.lineTo(w - padding,     railTopY + railGap);
+  // 下橫樑
+  ctx.moveTo(padding,         railBottomY);
+  ctx.lineTo(w - padding,     railBottomY);
+  ctx.moveTo(padding,         railBottomY - railGap);
+  ctx.lineTo(w - padding,     railBottomY - railGap);
+  ctx.stroke();
+
+  // 2. 畫垂直欄杆（端柱灰、中間橘改為深藍細線）
+  ctx.lineWidth = 1.5;
+  for (let i = 0, x = padding; i < totalBars; i++) {
     ctx.beginPath();
-    ctx.moveTo(startX, arrowY);
-    ctx.lineTo(endX, arrowY);
+    ctx.moveTo(x + barWpx / 2, railTopY + railGap);
+    ctx.lineTo(x + barWpx / 2, railBottomY - railGap);
     ctx.stroke();
-    // 箭頭頭
-    ctx.beginPath();
-    ctx.moveTo(startX, arrowY);
-    ctx.lineTo(startX + 6, arrowY - 6);
-    ctx.lineTo(startX + 6, arrowY + 6);
-    ctx.moveTo(endX, arrowY);
-    ctx.lineTo(endX - 6, arrowY - 6);
-    ctx.lineTo(endX - 6, arrowY + 6);
-    ctx.stroke();
-    // 標距文字
-    ctx.fillText(`${spacing.toFixed(2)} cm`, (startX + endX) / 2, arrowY - 10);
     x += barWpx + spPx;
   }
+
+  // 3. 畫尺寸虛線
+  const dimY = railTopY - 30;
+  ctx.setLineDash([5, 3]);
+  ctx.beginPath();
+  ctx.moveTo(padding, dimY);
+  ctx.lineTo(w - padding, dimY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 4. 畫尺寸延伸線
+  ctx.beginPath();
+  ctx.moveTo(padding, dimY);
+  ctx.lineTo(padding, railTopY);
+  ctx.moveTo(w - padding, dimY);
+  ctx.lineTo(w - padding, railTopY);
+  ctx.stroke();
+
+  // 5. 畫尺寸箭頭
+  const arrowSize = 6;
+  // 左箭頭
+  ctx.beginPath();
+  ctx.moveTo(padding, dimY);
+  ctx.lineTo(padding + arrowSize, dimY - arrowSize);
+  ctx.moveTo(padding, dimY);
+  ctx.lineTo(padding + arrowSize, dimY + arrowSize);
+  // 右箭頭
+  ctx.moveTo(w - padding, dimY);
+  ctx.lineTo(w - padding - arrowSize, dimY - arrowSize);
+  ctx.moveTo(w - padding, dimY);
+  ctx.lineTo(w - padding - arrowSize, dimY + arrowSize);
+  ctx.stroke();
+
+  // 6. 標註總長度文字
+  ctx.fillStyle = '#003366';
+  ctx.font = '16px sans-serif';
+  ctx.fillText(
+    `${total.toFixed(2)} cm`,
+    w / 2,
+    dimY - 10
+  );
 }
 
 // —— 綁定使用者輸入 ——
