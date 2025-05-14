@@ -10,10 +10,10 @@ const resultsEl = document.getElementById('results');
 const canvas = document.getElementById('previewCanvas');
 const ctx = canvas.getContext('2d');
 
-measureSwitch.addEventListener('change', e => {
+measureSwitch.addEventListener('change', () => {
   measureSwitch.setAttribute('aria-checked', measureSwitch.checked);
   measureLabel.textContent = measureSwitch.checked ? '包外 (外徑)' : '實內 (淨內)';
-  handleCalc();  // 開關改變也觸發計算
+  handleCalc();
 });
 
 function calcSpacing(total, barW, count) {
@@ -41,41 +41,21 @@ function drawPreview(total, barW, count, spacing) {
   const h = canvas.height;
   const baselineY = h - 40;
   const titleY = 30;
-  const gridStep = 50;
   const scale = (w - padding * 2) / total;
   ctx.clearRect(0, 0, w, h);
+
   ctx.textAlign = 'center';
   ctx.fillStyle = '#000';
   ctx.font = '16px sans-serif';
   ctx.fillText(`${count} 根等距排布 (間距 ${spacing.toFixed(2)} cm)`, w / 2, titleY);
-  // 畫格線
-  ctx.strokeStyle = '#ccc';
-  ctx.lineWidth = 1;
-  ctx.setLineDash([4, 4]);
-  for (let g = 1; g * gridStep < total; g++) {
-    const xg = padding + g * gridStep * scale;
-    ctx.beginPath();
-    ctx.moveTo(xg, titleY + 10);
-    ctx.lineTo(xg, baselineY);
-    ctx.stroke();
-  }
-  ctx.setLineDash([]);
-  // 底線
+
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.moveTo(padding, baselineY);
   ctx.lineTo(w - padding, baselineY);
   ctx.stroke();
-  // 0 標記與說明
-  ctx.beginPath();
-  ctx.moveTo(padding, baselineY);
-  ctx.lineTo(padding, baselineY - 10);
-  ctx.stroke();
-  ctx.font = '14px sans-serif';
-  ctx.fillText('0', padding, h - 10);
-  ctx.fillText('長度 (cm)', w / 2, h - 10);
-  // 畫條
+
   const barWpx = barW * scale;
   const spPx = spacing * scale;
   ctx.fillStyle = '#FFA500';
@@ -85,7 +65,7 @@ function drawPreview(total, barW, count, spacing) {
     ctx.fillRect(x, baselineY - barH, barWpx, barH);
     x += barWpx + spPx;
   }
-  // 畫箭頭與間距標註
+
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1;
   ctx.textAlign = 'center';
@@ -99,7 +79,6 @@ function drawPreview(total, barW, count, spacing) {
     ctx.moveTo(startX, arrowY);
     ctx.lineTo(endX, arrowY);
     ctx.stroke();
-    // 箭頭
     ctx.beginPath();
     ctx.moveTo(startX, arrowY);
     ctx.lineTo(startX + 6, arrowY - 6);
@@ -115,39 +94,42 @@ function drawPreview(total, barW, count, spacing) {
   }
 }
 
-// 抽成獨立函式，方便多點觸發
 function handleCalc(e) {
   if (e && e.preventDefault) e.preventDefault();
+
   const L0 = parseFloat(totalEl.value);
   const W  = parseFloat(widthEl.value);
   if (isNaN(L0) || isNaN(W)) {
-    resultsEl.innerHTML = ''; 
+    resultsEl.innerHTML = '';
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     return;
   }
-  let L = L0;
-  if (measureSwitch.checked) {
-    L += 2 * W;
-  }
+  let L = L0 + (measureSwitch.checked ? 2 * W : 0);
 
   const userCount   = parseInt(countEl.value, 10);
   const userSpacing = parseFloat(spacingEl.value);
 
-  let html = '<h2>結果</h2>';
   let lastCount, lastSpacing;
+  let html = '<h2>結果</h2>';
 
   if (!isNaN(userCount) && userCount >= 2) {
-    const sp = calcSpacing(L, W, userCount);
-    html += `<p>指定根數 <b>${userCount}</b> → 間距 ${sp.toFixed(2)} cm</p>`;
     lastCount   = userCount;
-    lastSpacing = sp;
+    lastSpacing = calcSpacing(L, W, lastCount);
+    spacingEl.value = lastSpacing.toFixed(2);
+    html += `<p>指定根數 <b>${lastCount}</b> → 間距 <b>${lastSpacing.toFixed(2)}</b> cm</p>`;
+  }
+  else if (!isNaN(userSpacing) && userSpacing >= 0) {
+    lastSpacing = userSpacing;
+    lastCount   = calcCountBySpacing(L, W, lastSpacing);
+    countEl.value = lastCount;
+    html += `<p>指定間距 <b>${lastSpacing.toFixed(2)}</b> cm → 根數 <b>${lastCount}</b> 根</p>`;
+  } else {
+    resultsEl.innerHTML = '';
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    return;
   }
 
-  if (!isNaN(userSpacing) && userSpacing >= 0) {
-    const c = calcCountBySpacing(L, W, userSpacing);
-    html += `<p>指定間距 ${userSpacing.toFixed(2)} cm → 根數 ${c} 根</p>`;
-  }
-
+  // 加回「所有可行方案」
   html += '<h3>所有可行方案</h3><ul>';
   genAllSchemes(L, W).forEach(o => {
     html += `<li>${o.count} 根 → 間距 ${o.spacing.toFixed(2)} cm</li>`;
@@ -156,19 +138,12 @@ function handleCalc(e) {
 
   resultsEl.innerHTML = html;
 
-  if (lastCount && lastSpacing >= 0) {
-    canvas.width  = resultsEl.clientWidth;
-    canvas.height = 150;
-    drawPreview(L, W, lastCount, lastSpacing);
-  } else {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  }
+  canvas.width  = resultsEl.clientWidth;
+  canvas.height = 150;
+  drawPreview(L, W, lastCount, lastSpacing);
 }
 
-// 1) Submit 時觸發
 form.addEventListener('submit', handleCalc);
-
-// 2) 輸入時自動觸發
 [ totalEl, widthEl, countEl, spacingEl ].forEach(el => {
   el.addEventListener('input', handleCalc);
 });
