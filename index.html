@@ -10,13 +10,46 @@
   <div class="container">
     <h1>等距鐵條排布計算機</h1>
     <form id="calcForm">
-      <label>總長度 (cm)：<input type="number" id="totalLength" required></label>
-      <label>鐵條寬度 (cm)：<input type="number" id="barWidth" required></label>
+      <!-- 小數精度到 2 位 -->
+      <div class="row">
+        <label>
+          總長度 (cm)：
+          <input type="number" id="totalLength" step="0.01" required>
+        </label>
+        <label>
+          鐵條寬度 (cm)：
+          <input type="number" id="barWidth" step="0.01" required>
+        </label>
+      </div>
+
+      <!-- 包外 / 實內 切換 -->
+      <div class="row toggle-group">
+        <label><input type="radio" name="measureType" value="outer" checked> 包外 (外徑)</label>
+        <label><input type="radio" name="measureType" value="inner"> 實內 (淨內)</label>
+      </div>
+
+      <!-- 指定根數計算間距 -->
+      <div class="row">
+        <label>
+          指定根數：
+          <input type="number" id="inputCount" min="2" step="1">
+        </label>
+      </div>
+
+      <!-- 指定間距計算根數 -->
+      <div class="row">
+        <label>
+          指定間距 (cm)：
+          <input type="number" id="inputSpacing" step="0.01" min="0">
+        </label>
+      </div>
+
       <button type="submit">計算</button>
     </form>
+
     <div id="results"></div>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
-
