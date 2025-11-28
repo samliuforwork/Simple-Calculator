@@ -368,4 +368,43 @@ button[type="submit"]:hover {
   .tab-panel {
     border-radius: var(--radius);
   }
+
+  .app {
+    padding: 1.25rem 0.75rem 2rem;
+  }
+
+  .app__header h1 {
+    font-size: 1.6rem;
+  }
+
+  .tab {
+    font-size: 0.95rem;
+    padding: 0.75rem 0.85rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+
+  .form-row {
+    gap: 0.25rem;
+  }
+
+  .input-with-unit,
+  .input-with-hint {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .unit-label {
+    font-size: 0.8rem;
+  }
+
+  .canvas-card canvas {
+    height: 320px;
+  }
+
+  #previewCanvas {
+    height: 180px;
+  }
 }
