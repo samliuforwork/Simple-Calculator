@@ -3,28 +3,157 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>等距鐵條排布計算機</title>
+  <title>鋼構柱配置輔助工具</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
-    <h1>等距鐵條排布計算機</h1>
-    <form id="calcForm">
-      <div class="row">
-        <label>總長度 (mm)：<input type="number" id="totalLength" step="0.01" required></label>
-        <label>鐵條寬度 (mm)：<input type="number" id="barWidth" step="0.01" required></label>
+  <div class="app">
+    <header class="app__header">
+      <h1>鋼構柱配置輔助工具</h1>
+      <p>同一個頁面內提供「柱高 / 斜梁示意」與原本的「等距鐵條排布」兩個工具，透過頁籤快速切換。</p>
+    </header>
+
+    <div class="tab-bar" role="tablist" aria-label="工具選單">
+      <button type="button" class="tab is-active" role="tab" aria-selected="true" aria-controls="columnTab" data-tab="columnTab">
+        柱高 + 斜梁
+      </button>
+      <button type="button" class="tab" role="tab" aria-selected="false" aria-controls="spacingTab" data-tab="spacingTab">
+        等距鐵條排布
+      </button>
+    </div>
+
+    <section id="columnTab" class="tab-panel is-active" role="tabpanel">
+      <div class="grid two-col">
+        <div class="card">
+          <h2>輸入參數</h2>
+          <form id="columnForm" novalidate>
+            <div class="section-title">柱子高度設定</div>
+            <div class="form-row">
+              <label for="colHStart">最低點</label>
+              <div class="input-with-unit">
+                <input id="colHStart" type="number" step="0.001" placeholder="例如 3000">
+                <span class="unit-label">mm</span>
+              </div>
+            </div>
+            <div class="form-row">
+              <label for="colHEnd">最高點</label>
+              <div class="input-with-unit">
+                <input id="colHEnd" type="number" step="0.001" placeholder="例如 5000">
+                <span class="unit-label">mm</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>高度模式</label>
+              <div class="mode-options">
+                <label>
+                  <input type="radio" name="heightMode" value="slopeAuto" checked>
+                  兩端決定斜率，自動內插
+                </label>
+                <label>
+                  <input type="radio" name="heightMode" value="customHeights">
+                  手動輸入每支柱高度
+                </label>
+              </div>
+            </div>
+            <div class="form-row is-hidden" id="heightListRow">
+              <label for="heightList">每支柱高度列表</label>
+              <textarea id="heightList" placeholder="依序輸入柱1, 柱2 ... 例如：3000, 3654, 4321, 5000"></textarea>
+            </div>
+
+            <div class="section-title">柱數與距離模式</div>
+            <div class="form-row">
+              <label for="middleCount">中間柱數量</label>
+              <div class="input-with-hint">
+                <input id="middleCount" type="number" step="1" min="0" placeholder="例如 2">
+                <span class="unit-label">0 代表只有兩支柱（僅自動模式）</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>距離輸入方式</label>
+              <div class="mode-options">
+                <label>
+                  <input type="radio" name="lengthMode" value="totalEven" checked>
+                  總長度均分
+                </label>
+                <label>
+                  <input type="radio" name="lengthMode" value="customSpans">
+                  自訂每跨柱距（不等距）
+                </label>
+              </div>
+            </div>
+            <div class="form-row" id="totalLengthRow">
+              <label for="colTotalLength">總長度（柱1 → 最後一柱）</label>
+              <div class="input-with-unit">
+                <input id="colTotalLength" type="number" step="0.001" placeholder="例如 8000">
+                <span class="unit-label">mm</span>
+              </div>
+            </div>
+            <div class="form-row is-hidden" id="customSpansRow">
+              <label for="spanList">各跨柱距列表</label>
+              <textarea id="spanList" placeholder="例如：3000, 2500, 2500（共 3 跨）"></textarea>
+            </div>
+
+            <div class="section-title">柱截面深度（梁方向寬度，僅影響圖面）</div>
+            <div class="form-row">
+              <label for="columnDepth">柱深度 / 寬度</label>
+              <div class="input-with-unit">
+                <input id="columnDepth" type="number" step="0.001" value="100">
+                <span class="unit-label">mm（例如 H100, H200）</span>
+              </div>
+            </div>
+
+            <button type="submit">🧮 開始計算</button>
+          </form>
+          <div class="results" id="columnResults"></div>
+        </div>
+
+        <div class="card canvas-card">
+          <h2>立面示意圖（非比例，含多排尺寸與柱寬截面）</h2>
+          <canvas id="columnCanvas" width="700" height="430"></canvas>
+          <div class="legend">
+            <div class="badge">
+              <span class="line-column"></span> 柱子（有寬度）
+            </div>
+            <div class="badge">
+              <span class="line-beam"></span> H 鋼斜梁（柱頂相連 + 柱寬上的斜接線）
+            </div>
+            <div class="badge">
+              <span class="line-ground"></span> 基準地面線 + 多排尺寸
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="row">
-        <label>指定根數：<input type="number" id="inputCount" min="1" step="1"></label>
+    </section>
+
+    <section id="spacingTab" class="tab-panel" role="tabpanel" aria-hidden="true">
+      <div class="card">
+        <h2>等距鐵條排布</h2>
+        <form id="spacingForm" novalidate>
+          <div class="row">
+            <label>總長度 (mm)
+              <input type="number" id="totalLength" step="0.01" required>
+            </label>
+            <label>鐵條寬度 (mm)
+              <input type="number" id="barWidth" step="0.01" required>
+            </label>
+          </div>
+          <div class="row">
+            <label>指定根數
+              <input type="number" id="inputCount" min="1" step="1">
+            </label>
+            <label>指定間距 (mm)
+              <input type="number" id="inputSpacing" step="0.01" min="0">
+            </label>
+          </div>
+          <button type="submit" class="sr-only">計算</button>
+        </form>
+        <canvas id="previewCanvas"></canvas>
+        <div id="spacingResults" class="results"></div>
       </div>
-      <div class="row">
-        <label>指定間距 (mm)：<input type="number" id="inputSpacing" step="0.01" min="0"></label>
-      </div>
-      <button type="submit" style="display: none;">計算</button>
-    </form>
-    <canvas id="previewCanvas"></canvas>
-    <div id="results"></div>
+    </section>
   </div>
-  <script src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
