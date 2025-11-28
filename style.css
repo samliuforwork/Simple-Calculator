@@ -12,6 +12,7 @@
   --radius: 12px;
 }
 
+/* ─── Base reset ───────────────────────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -26,6 +27,7 @@ body {
   line-height: 1.5;
 }
 
+/* ─── Layout + Tabs ───────────────────────────────────────────────────────── */
 .app {
   max-width: 1200px;
   margin: 0 auto;
@@ -40,6 +42,14 @@ body {
 .app__header h1 {
   margin-bottom: 0.25rem;
   font-size: 2rem;
+}
+
+.column-intro {
+  margin-bottom: 1.25rem;
+}
+
+.column-intro .description {
+  margin-bottom: 0;
 }
 
 .tab-bar {
@@ -82,8 +92,14 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .grid {
@@ -110,6 +126,7 @@ body {
   font-size: 1.25rem;
 }
 
+/* ─── Forms ───────────────────────────────────────────────────────────────── */
 form {
   display: flex;
   flex-direction: column;
@@ -181,6 +198,18 @@ textarea {
   color: var(--color-text);
 }
 
+/* legacy row layout on second tab */
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.row label {
+  flex: 1 1 220px;
+}
+
+/* ─── Buttons ─────────────────────────────────────────────────────────────── */
 button[type="submit"] {
   margin-top: 0.75rem;
   padding: 0.85rem;
@@ -198,6 +227,7 @@ button[type="submit"]:hover {
   background: var(--color-primary-dark);
 }
 
+/* ─── Results tables ─────────────────────────────────────────────────────── */
 .results {
   margin-top: 1.5rem;
   border-top: 1px dashed var(--color-border);
@@ -239,11 +269,22 @@ button[type="submit"]:hover {
   color: var(--color-muted);
 }
 
+.results .highlight {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
 .results .error {
   color: #b00020;
   font-weight: 600;
 }
 
+.highlight {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* ─── Visual legend + canvases ───────────────────────────────────────────── */
 .legend {
   display: flex;
   flex-wrap: wrap;
@@ -270,9 +311,17 @@ button[type="submit"]:hover {
   display: inline-block;
 }
 
-.line-column { background: #355c7d; }
-.line-beam { background: linear-gradient(90deg, #b66d0d, #ffd479); }
-.line-ground { background: #4c566a; }
+.line-column {
+  background: #355c7d;
+}
+
+.line-beam {
+  background: linear-gradient(90deg, #b66d0d, #ffd479);
+}
+
+.line-ground {
+  background: #4c566a;
+}
 
 .canvas-card canvas {
   width: 100%;
@@ -280,16 +329,6 @@ button[type="submit"]:hover {
   border: 1px dashed var(--color-border);
   border-radius: 10px;
   background: #fff;
-}
-
-.row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.row label {
-  flex: 1 1 220px;
 }
 
 #previewCanvas {
@@ -300,6 +339,7 @@ button[type="submit"]:hover {
   border-radius: 10px;
 }
 
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
 .sr-only {
   position: absolute;
   width: 1px;
@@ -315,6 +355,7 @@ button[type="submit"]:hover {
   display: none;
 }
 
+/* ─── Responsive tweaks ──────────────────────────────────────────────────── */
 @media (max-width: 600px) {
   .tab-bar {
     flex-direction: column;
