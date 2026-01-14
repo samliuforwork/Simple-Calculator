@@ -30,7 +30,10 @@
           - 距離可用「總長度均分」或「自訂每跨柱距（不等距）」。<br>
           - 顯示：柱位置尺寸、多排長度尺寸、各柱高度、各跨 H 鋼斜長與坡度。<br>
           - 柱截面深度只影響圖面柱寬，不參與 ΔH 計算。<br>
-          - 柱寬兩端高差 ΔH 以固定標註寬度 100 mm 計算，與使用 H100 / H200 無關。
+          - 輸入最低點與最高點或手動輸入每個柱高<br>
+          - 距離可用「總長度均分」或「自訂跨距」。<br>
+          - 總長度尺寸包外，高度為中心，每柱距離為中心。<br>
+          - 起頭柱與最尾柱ΔH，中間柱ΔH÷ 2。<br>
         </p>
       </div>
 
@@ -55,7 +58,7 @@
               <div class="mode-options">
                 <label>
                   <input type="radio" name="heightMode" value="slopeAuto" checked>
-                  兩端決定斜率，自動內插
+                  最低與最高點(自動求出斜率)
                 </label>
                 <label>
                   <input type="radio" name="heightMode" value="customHeights">
@@ -65,7 +68,7 @@
             </div>
 
             <div class="form-row is-hidden" id="heightListRow">
-              <label for="heightList">每支柱高度列表</label>
+              <label for="heightList">每柱高度(中心)</label>
               <textarea id="heightList" placeholder="依序輸入柱1, 柱2, 柱3... 例如：3000, 3654, 4321, 5000"></textarea>
             </div>
 
@@ -73,7 +76,7 @@
             <div class="form-row">
               <label for="middleCount">中間柱數量</label>
               <input id="middleCount" type="number" step="1" min="0" placeholder="例如 2">
-              <span class="unit-label">0 代表只有兩支柱（僅自動模式用）</span>
+              <span class="unit-label">未輸入為自訂模式</span>
             </div>
 
             <div class="form-row">
@@ -81,17 +84,17 @@
               <div class="mode-options">
                 <label>
                   <input type="radio" name="lengthMode" value="totalEven" checked>
-                  總長度均分
+                  總長度)
                 </label>
                 <label>
                   <input type="radio" name="lengthMode" value="customSpans">
-                  自訂每跨柱距（不等距）
+                  手輸跨距
                 </label>
               </div>
             </div>
 
             <div class="form-row" id="totalLengthRow">
-              <label for="colTotalLength">總長度（柱1 → 最後一柱）</label>
+              <label for="colTotalLength">總長度（包外）</label>
               <input id="colTotalLength" type="number" step="0.001" placeholder="例如 8000">
               <span class="unit-label">mm</span>
             </div>
@@ -101,9 +104,9 @@
               <textarea id="spanList" placeholder="例如：3000, 2500, 2500（共 3 跨）"></textarea>
             </div>
 
-            <div class="section-title">柱截面深度（梁方向寬度，僅影響圖面）</div>
+            <div class="section-title">H鋼規格</div>
             <div class="form-row">
-              <label for="columnDepth">柱深度 / 寬度</label>
+              <label for="columnDepth">規格</label>
               <input id="columnDepth" type="number" step="0.001" value="100">
               <span class="unit-label">mm（例如 H100, H200）</span>
             </div>
@@ -116,7 +119,7 @@
         </div>
 
         <div class="card canvas-card">
-          <h2>立面示意圖（非比例，含多排尺寸與柱寬截面）</h2>
+          <h2>立面示意圖（非比例）</h2>
           <canvas id="columnCanvas" width="700" height="430"></canvas>
           <div class="legend">
             <div class="badge">
